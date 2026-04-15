@@ -1,33 +1,45 @@
-body {
+html, body {
   margin: 0;
+  padding: 0;
   font-family: Arial;
   background: linear-gradient(#222, #444);
   color: white;
   text-align: center;
+  overscroll-behavior: none;
 }
 
 .hidden {
   display: none;
 }
 
+/* MENU */
 #menu, #shop, #ranking {
-  padding-top: 80px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
+/* BOTÕES */
 button {
-  display: block;
   margin: 10px auto;
   padding: 15px 40px;
   font-size: 18px;
   border-radius: 12px;
   border: none;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+button:active {
+  transform: scale(0.9);
 }
 
 #playBtn { background: limegreen; }
 #shopBtn { background: orange; }
 #rankBtn { background: cyan; }
 
+/* HUD */
 #hud {
   position: fixed;
   top: 0;
@@ -38,6 +50,7 @@ button {
   justify-content: space-around;
 }
 
+/* ALVO */
 .target {
   position: absolute;
   width: 60px;
@@ -48,7 +61,7 @@ button {
   align-items: center;
   font-size: 24px;
   cursor: pointer;
-  transition: 0.15s;
+  transition: transform 0.15s, opacity 0.15s;
 }
 
 .hit {
