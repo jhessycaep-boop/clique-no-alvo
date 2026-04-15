@@ -1,0 +1,155 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  overflow: hidden;
+  background: #f2f2f2;
+}
+
+/* ===== TELA INICIAL ===== */
+#startScreen {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(to bottom, #ffffff, #eaeaea);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#startScreen h1 {
+  font-size: 42px;
+  margin-bottom: 25px;
+}
+
+#startBtn {
+  font-size: 24px;
+  padding: 16px 50px;
+  border: none;
+  border-radius: 18px;
+  background: red;
+  color: white;
+  cursor: pointer;
+}
+
+#startBtn:hover {
+  opacity: 0.85;
+}
+
+/* ===== JOGO ===== */
+#game {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ===== HUD ===== */
+#scoreboard {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  padding: 12px;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  font-size: 16px;
+  z-index: 1000;
+}
+
+/* ===== BOTÃO CLAIM ===== */
+#claimBtn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 10px;
+  background: purple;
+  color: white;
+  cursor: pointer;
+}
+
+/* ===== ALVOS ===== */
+.target {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+  font-size: 26px;
+
+  width: 60px;
+  height: 60px;
+
+  cursor: pointer;
+  user-select: none;
+
+  box-shadow: 0px 6px 12px rgba(0,0,0,0.25);
+
+  /* ⭐ ESSENCIAL PRA ANIMAÇÃO FUNCIONAR */
+  transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+.hit {
+  transform: scale(1.8);
+  opacity: 0;
+  transition: 0.15s ease-out;
+}
+
+.target:active {
+  transform: scale(0.85);
+}
+
+
+
+/* ===== GAME OVER SCREEN ===== */
+#gameOverScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0,0,0,0.85);
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+}
+
+#gameOverScreen h1 {
+  font-size: 50px;
+  margin-bottom: 15px;
+}
+
+#gameOverScreen p {
+  font-size: 22px;
+  margin-bottom: 25px;
+}
+
+#restartBtn {
+  font-size: 22px;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 15px;
+  background: limegreen;
+  cursor: pointer;
+}
+
+#restartBtn:hover {
+  opacity: 0.85;
+}
