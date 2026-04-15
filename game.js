@@ -11,40 +11,56 @@ const game = document.getElementById("game");
 
 const coinsEl = document.getElementById("coins");
 
+// 🔊 ÁUDIOS
+const soundHit = new Audio("hit.mp3");
+const soundMiss = new Audio("miss.mp3");
+const soundPower = new Audio("powerup.mp3");
+
+coinsEl.textContent = coins;
+
 document.getElementById("playBtn").onclick = startGame;
 document.getElementById("shopBtn").onclick = () => show(shop);
 document.getElementById("rankBtn").onclick = showRanking;
 
+// ===== TELAS =====
 function show(el){
-  menu.classList.add("hidden");
-  shop.classList.add("hidden");
-  rankingDiv.classList.add("hidden");
-  game.classList.add("hidden");
-  el.classList.remove("hidden");
+  menu.style.display = "none";
+  shop.style.display = "none";
+  rankingDiv.style.display = "none";
+  game.style.display = "none";
+
+  el.style.display = "block";
 }
 
 function backMenu(){
   show(menu);
 }
 
+// ===== RANKING =====
 function showRanking(){
   show(rankingDiv);
+
   const list = document.getElementById("rankList");
   list.innerHTML = "";
+
   ranking.forEach((s,i)=>{
     list.innerHTML += `<li>${i+1}º - ${s}</li>`;
   });
 }
 
+// ===== LOJA =====
 function buy(type){
   const price = {life:50,time:50,slow:80};
+
   if(coins>=price[type]){
     coins-=price[type];
     upgrades[type]++;
     save();
-    alert("Comprado!");
     coinsEl.textContent = coins;
-  } else alert("Sem moedas!");
+    alert("Comprado!");
+  } else {
+    alert("Sem moedas!");
+  }
 }
 
 function save(){
@@ -52,8 +68,28 @@ function save(){
   localStorage.setItem("upgrades",JSON.stringify(upgrades));
 }
 
+// ===== JOGO =====
 function startGame(){
+
+  // 🔊 desbloqueia áudio (ESSENCIAL)
+  [soundHit, soundMiss, soundPower].forEach(s=>{
+    s.play().then(()=>{
+      s.pause();
+      s.currentTime=0;
+    }).catch(()=>{});
+  });
+
   show(game);
+
+  // 🔥 LIMPA QUALQUER ALVO ANTIGO
+  game.innerHTML = `
+    <div id="hud">
+      <span>Pontos: <span id="score">0</span></span>
+      <span>Vidas: <span id="lives">5</span></span>
+      <span>Tempo: <span id="timer">60</span></span>
+      <span>Streak: <span id="streak">0</span></span>
+    </div>
+  `;
 
   let score=0;
   let lives=5+upgrades.life;
@@ -73,6 +109,7 @@ function startGame(){
   }
 
   function spawn(){
+
     if(time<=0||lives<=0) return end();
 
     const t=document.createElement("div");
@@ -90,17 +127,29 @@ function startGame(){
         game.removeChild(t);
         lives--;
         streak=0;
+        soundMiss.cloneNode().play();
         update();
       }
     },800);
 
     t.onclick=()=>{
       clearTimeout(timeout);
+
       t.classList.add("hit");
+
       setTimeout(()=>t.remove(),100);
 
       score++;
       streak++;
+
+      // 🔊 som de acerto
+      soundHit.cloneNode().play();
+
+      // 🔥 powerup simples
+      if(streak===5){
+        soundPower.cloneNode().play();
+      }
+
       update();
     };
 
@@ -108,7 +157,9 @@ function startGame(){
   }
 
   function end(){
+
     coins+=Math.floor(score/2);
+
     ranking.push(score);
     ranking.sort((a,b)=>b-a);
     ranking=ranking.slice(0,5);
@@ -120,13 +171,16 @@ function startGame(){
     location.reload();
   }
 
-  setInterval(()=>{time--;update();},1000);
+  setInterval(()=>{
+    time--;
+    update();
+  },1000);
 
   spawn();
   update();
 }
 
-/* 🔥 TORNA FUNÇÕES GLOBAIS */
+// 🔥 GLOBAL
 window.buy = buy;
 window.backMenu = backMenu;
 
