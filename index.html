@@ -2,9 +2,21 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Clique no Alvo</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+
+  <!-- iOS suporte básico -->
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <!-- MENU -->
@@ -26,14 +38,14 @@
   <button onclick="buy('time')">⏱️ +10 Tempo (50)</button>
   <button onclick="buy('slow')">🐢 Slow Melhor (80)</button>
 
-  <button onclick="backMenu()">Voltar</button>
+  <button onclick="backMenu()">⬅️ Voltar</button>
 </div>
 
 <!-- RANKING -->
 <div id="ranking" class="hidden">
   <h2>🏆 Ranking</h2>
   <ul id="rankList"></ul>
-  <button onclick="backMenu()">Voltar</button>
+  <button onclick="backMenu()">⬅️ Voltar</button>
 </div>
 
 <!-- JOGO -->
@@ -46,6 +58,19 @@
   </div>
 </div>
 
+<!-- SCRIPT DO JOGO -->
 <script src="game.js"></script>
+
+<!-- SERVICE WORKER (ESSENCIAL PRO PWA) -->
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js")
+      .then(() => console.log("SW registrado"))
+      .catch(err => console.log("Erro SW:", err));
+  });
+}
+</script>
+
 </body>
 </html>
