@@ -2,47 +2,50 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clique no Alvo</title>
-
-  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-  <!-- TELA INICIAL -->
-  <div id="startScreen">
-    <h1>🎯 Clique no Alvo</h1>
-    <button id="startBtn">COMEÇAR</button>
+<!-- MENU -->
+<div id="menu">
+  <h1>🎯 Clique no Alvo</h1>
+
+  <button id="playBtn">Jogar</button>
+  <button id="shopBtn">Loja</button>
+  <button id="rankBtn">Ranking</button>
+
+  <p>💰 Moedas: <span id="coins">0</span></p>
+</div>
+
+<!-- LOJA -->
+<div id="shop" class="hidden">
+  <h2>🛒 Loja</h2>
+
+  <button onclick="buy('life')">❤️ +1 Vida (50)</button>
+  <button onclick="buy('time')">⏱️ +10 Tempo (50)</button>
+  <button onclick="buy('slow')">🐢 Slow Melhor (80)</button>
+
+  <button onclick="backMenu()">Voltar</button>
+</div>
+
+<!-- RANKING -->
+<div id="ranking" class="hidden">
+  <h2>🏆 Ranking</h2>
+  <ul id="rankList"></ul>
+  <button onclick="backMenu()">Voltar</button>
+</div>
+
+<!-- JOGO -->
+<div id="game" class="hidden">
+  <div id="hud">
+    <span>Pontos: <span id="score">0</span></span>
+    <span>Vidas: <span id="lives">5</span></span>
+    <span>Tempo: <span id="timer">60</span></span>
+    <span>Streak: <span id="streak">0</span></span>
   </div>
+</div>
 
-  <!-- JOGO -->
-  <div id="game" style="display:none;">
-
-    <!-- HUD -->
-    <div id="scoreboard">
-      <div>Pontos: <span id="score">0</span></div>
-      <div>Vidas: <span id="lives">5</span></div>
-      <div>Tempo: <span id="timer">60</span>s</div>
-      <div>Streak: <span id="streak">0</span></div>
-      <div>Recorde: <span id="highScore">0</span></div>
-
-      <button id="claimBtn" style="display:none;">
-        Resgatar 😱
-      </button>
-    </div>
-
-    <!-- GAME OVER SCREEN -->
-    <div id="gameOverScreen" style="display:none;">
-      <h1>💀 Game Over</h1>
-      <p>Pontuação final: <span id="finalScore">0</span></p>
-
-      <button id="restartBtn">Jogar de novo</button>
-    </div>
-
-  </div>
-
-  <script src="game.js"></script>
+<script src="game.js"></script>
 </body>
 </html>
