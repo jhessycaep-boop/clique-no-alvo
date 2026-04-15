@@ -10,31 +10,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const streakEl = document.getElementById("streak");
   const timerEl = document.getElementById("timer");
 
-  // ===== ÁUDIOS =====
-  const soundHit = new Audio("sounds/hit.mp3");
-  const soundMiss = new Audio("sounds/miss.mp3");
-  const soundPower = new Audio("sounds/powerup.mp3");
-  const soundRare = new Audio("sounds/rare.mp3");
-  const soundScare = new Audio("sounds/scare.mp3");
+  const soundHit = new Audio("hit.mp3");
+  const soundMiss = new Audio("miss.mp3");
+  const soundPower = new Audio("powerup.mp3");
+  const soundRare = new Audio("rare.mp3");
+  const soundScare = new Audio("scare.mp3");
 
-  let score = 0;
-  let lives = 3;
-  let streak = 0;
-  let timeLeft = 30;
-  let spawnInterval = 900;
-  let gameOver = true;
-  let timer;
+  let score, lives, streak, timeLeft;
+  let gameOver, timer;
+  let spawnInterval;
 
   let cursedUnlocked = localStorage.getItem("cursedUnlocked") === "true";
   let streakRewardReady = false;
 
-  // ===== DESBLOQUEAR ÁUDIO NO PRIMEIRO CLIQUE =====
   startBtn.addEventListener("click", () => {
 
-    [soundHit, soundMiss, soundPower, soundRare, soundScare].forEach(sound => {
-      sound.play().then(() => {
-        sound.pause();
-        sound.currentTime = 0;
+    // desbloqueia áudio
+    [soundHit, soundMiss, soundPower, soundRare, soundScare].forEach(s => {
+      s.play().then(() => {
+        s.pause();
+        s.currentTime = 0;
       }).catch(() => {});
     });
 
@@ -46,19 +41,18 @@ document.addEventListener("DOMContentLoaded", () => {
     startTimer();
   });
 
-  // ===== RESET =====
   function resetGame() {
     score = 0;
-    lives = 3;
+    lives = 5;
     streak = 0;
-    timeLeft = 30;
+    timeLeft = 60;
+    spawnInterval = 900;
     gameOver = false;
     streakRewardReady = false;
     claimBtn.style.display = "none";
     updateHUD();
   }
 
-  // ===== HUD =====
   function updateHUD() {
     scoreEl.textContent = score;
     livesEl.textContent = lives;
@@ -66,9 +60,14 @@ document.addEventListener("DOMContentLoaded", () => {
     timerEl.textContent = timeLeft;
   }
 
-  // ===== TIMER =====
-  function startTimer() {
+  function endGame(msg) {
+    gameOver = true;
     clearInterval(timer);
+    alert("Game Over!\n" + msg + "\nPontuação: " + score);
+    location.reload();
+  }
+
+  function startTimer() {
     timer = setInterval(() => {
       timeLeft--;
       updateHUD();
@@ -76,35 +75,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
   }
 
-  // ===== GAME OVER =====
-  function endGame(msg) {
-    gameOver = true;
-    clearInterval(timer);
-    alert("Game Over! " + msg);
-    location.reload();
-  }
-
-  // ===== ESCOLHER TIPO DE ALVO =====
   function pickTarget() {
+    let r = Math.random();
 
-    let chance = Math.random();
+    if (r < 0.05) return { emoji: "🤡", color: "gold", points: 5, rare: true };
+    if (r < 0.12) return { emoji: "💣", color: "black", points: 0 };
 
-    if (chance < 0.1) {
-      return { color: "gold", emoji: "🤡", points: 5, rare: true };
-    }
+    if (cursedUnlocked && r < 0.20)
+      return { emoji: "😈", color: "purple", points: 0, cursed: true };
 
-    if (chance < 0.2) {
-      return { color: "black", emoji: "💣", points: 0 };
-    }
-
-    if (cursedUnlocked && chance < 0.3) {
-      return { color: "purple", emoji: "😈", points: 0, cursed: true };
-    }
-
-    return { color: "yellow", emoji: "🎯", points: 1 };
+    return { emoji: "🎯", color: "yellow", points: 1 };
   }
 
-  // ===== SPAWN =====
   function spawnTarget() {
 
     if (gameOver) return;
@@ -112,17 +94,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const type = pickTarget();
     const target = document.createElement("div");
     target.className = "target";
-    target.style.background = type.color;
     target.textContent = type.emoji;
+    target.style.background = type.color;
 
-    const hudHeight = 90;
+    const hud = 90;
     const size = 60;
 
-    const maxX = window.innerWidth - size;
-    const maxY = window.innerHeight - hudHeight - size;
-
-    target.style.left = Math.random() * maxX + "px";
-    target.style.top = hudHeight + Math.random() * maxY + "px";
+    target.style.left = Math.random() * (window.innerWidth - size) + "px";
+    target.style.top = hud + Math.random() * (window.innerHeight - hud - size) + "px";
 
     game.appendChild(target);
 
@@ -130,13 +109,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!game.contains(target)) return;
 
-      game.removeChild(target); // 🔥 REMOVE SEMPRE
+      game.removeChild(target);
 
-      if (type.rare) return endGame("Ignorou o alvo raro 🤡");
+      if (type.rare) return endGame("Perdeu o raro 🤡");
 
       if (type.cursed) {
         soundScare.cloneNode().play();
-        showScaryEmoji();
+        showScare();
         return;
       }
 
@@ -146,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
         soundMiss.cloneNode().play();
       }
 
-      if (lives <= 0) endGame("Sem vidas!");
+      if (lives <= 0) endGame("Sem vidas");
 
       updateHUD();
 
@@ -158,16 +137,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       clearTimeout(timeout);
 
-      if (type.cursed) {
-        return endGame("Clicou no alvo maldito 😭");
-      }
+      if (type.cursed) return endGame("Clicou no maldito 😈");
 
       target.classList.add("hit");
 
       setTimeout(() => {
-        if (game.contains(target)) {
-          game.removeChild(target);
-        }
+        if (game.contains(target)) game.removeChild(target);
       }, 120);
 
       score += type.points;
@@ -188,36 +163,35 @@ document.addEventListener("DOMContentLoaded", () => {
         soundMiss.cloneNode().play();
       }
 
+      if (streak === 6) soundPower.cloneNode().play();
+
       updateHUD();
     });
 
     setTimeout(spawnTarget, spawnInterval);
   }
 
-  // ===== JUMPSCARE =====
-  function showScaryEmoji() {
-    const scare = document.createElement("div");
-    scare.textContent = "👹";
-    scare.style.position = "fixed";
-    scare.style.fontSize = "120px";
-    scare.style.top = "50%";
-    scare.style.left = "50%";
-    scare.style.transform = "translate(-50%, -50%)";
-    scare.style.zIndex = "999";
-    document.body.appendChild(scare);
+  function showScare() {
+    const e = document.createElement("div");
+    e.textContent = "👹";
+    e.style.position = "fixed";
+    e.style.fontSize = "120px";
+    e.style.top = "50%";
+    e.style.left = "50%";
+    e.style.transform = "translate(-50%, -50%)";
+    e.style.zIndex = "9999";
 
-    setTimeout(() => {
-      document.body.removeChild(scare);
-    }, 500);
+    document.body.appendChild(e);
+
+    setTimeout(() => e.remove(), 500);
   }
 
-  // ===== RESGATE =====
   claimBtn.addEventListener("click", () => {
     cursedUnlocked = true;
     localStorage.setItem("cursedUnlocked", "true");
     claimBtn.style.display = "none";
     soundPower.cloneNode().play();
-    alert("Alvo Maldito desbloqueado 😈");
+    alert("Alvo maldito desbloqueado 😈");
   });
 
 });
