@@ -3,18 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Clique no Alvo</title>
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
-
-  <!-- iOS suporte básico -->
   <link rel="apple-touch-icon" href="icon-192.png">
 
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- BLOQUEAR SCROLL -->
+  <style>
+    html, body {
+      overscroll-behavior: none;
+    }
+  </style>
 </head>
 
 <body>
@@ -58,18 +62,29 @@
   </div>
 </div>
 
-<!-- SCRIPT DO JOGO -->
 <script src="game.js"></script>
 
-<!-- SERVICE WORKER (ESSENCIAL PRO PWA) -->
+<!-- SERVICE WORKER -->
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js")
-      .then(() => console.log("SW registrado"))
-      .catch(err => console.log("Erro SW:", err));
+    navigator.serviceWorker.register("sw.js");
   });
 }
+</script>
+
+<!-- BLOQUEAR SWIPE -->
+<script>
+let startY = 0;
+
+document.addEventListener("touchstart", e => {
+  startY = e.touches[0].clientY;
+});
+
+document.addEventListener("touchmove", e => {
+  let y = e.touches[0].clientY;
+  if (y > startY) e.preventDefault();
+}, { passive: false });
 </script>
 
 </body>
