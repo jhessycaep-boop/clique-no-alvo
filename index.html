@@ -5,86 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clique no Alvo</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
   <link rel="apple-touch-icon" href="icon-192.png">
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 
-  <!-- BLOQUEAR SCROLL -->
   <style>
-    html, body {
-      overscroll-behavior: none;
-    }
+    html, body { overscroll-behavior: none; }
   </style>
 </head>
 
 <body>
 
-<!-- MENU -->
 <div id="menu">
   <h1>🎯 Clique no Alvo</h1>
-
   <button id="playBtn">Jogar</button>
   <button id="shopBtn">Loja</button>
   <button id="rankBtn">Ranking</button>
-
   <p>💰 Moedas: <span id="coins">0</span></p>
 </div>
 
-<!-- LOJA -->
 <div id="shop" class="hidden">
   <h2>🛒 Loja</h2>
-
-  <button onclick="buy('life')">❤️ +1 Vida (50)</button>
-  <button onclick="buy('time')">⏱️ +10 Tempo (50)</button>
-  <button onclick="buy('slow')">🐢 Slow Melhor (80)</button>
-
+  <button onclick="buy('life')">❤️ Vida (50)</button>
+  <button onclick="buy('time')">⏱️ Tempo (50)</button>
+  <button onclick="buy('ice')">❄️ Gelo (30)</button>
+  <button onclick="buy('electric')">⚡ Elétrico (40)</button>
   <button onclick="backMenu()">⬅️ Voltar</button>
 </div>
 
-<!-- RANKING -->
 <div id="ranking" class="hidden">
   <h2>🏆 Ranking</h2>
   <ul id="rankList"></ul>
   <button onclick="backMenu()">⬅️ Voltar</button>
 </div>
 
-<!-- JOGO -->
-<div id="game" class="hidden">
-  <div id="hud">
-    <span>Pontos: <span id="score">0</span></span>
-    <span>Vidas: <span id="lives">5</span></span>
-    <span>Tempo: <span id="timer">60</span></span>
-    <span>Streak: <span id="streak">0</span></span>
-  </div>
-</div>
+<div id="game" class="hidden"></div>
 
 <script src="game.js"></script>
 
-<!-- SERVICE WORKER -->
 <script>
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js");
-  });
+  navigator.serviceWorker.register("sw.js");
 }
 </script>
 
-<!-- BLOQUEAR SWIPE -->
 <script>
 let startY = 0;
-
-document.addEventListener("touchstart", e => {
-  startY = e.touches[0].clientY;
-});
-
+document.addEventListener("touchstart", e => startY = e.touches[0].clientY);
 document.addEventListener("touchmove", e => {
-  let y = e.touches[0].clientY;
-  if (y > startY) e.preventDefault();
-}, { passive: false });
+  if(e.touches[0].clientY > startY) e.preventDefault();
+},{passive:false});
 </script>
 
 </body>
