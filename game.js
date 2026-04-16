@@ -89,21 +89,25 @@ function startGame(){
     <span>Pontos: <span id="score">0</span></span>
     <span>Vidas: <span id="lives">5</span></span>
     <span>Tempo: <span id="timer">60</span></span>
+    <span>Streak: <span id="streak">0</span></span>
   </div>`;
 
   let score=0;
   let lives=5+upgrades.life;
   let time=60+upgrades.time;
+  let streak = 0;
   let speed=900;
 
   const scoreEl=document.getElementById("score");
   const livesEl=document.getElementById("lives");
   const timerEl=document.getElementById("timer");
+  const streakEl = document.getElementById("streak");
 
   function update(){
     scoreEl.textContent=score;
     livesEl.textContent=lives;
     timerEl.textContent=time;
+    streakEl.textContent = streak;
   }
 
   function freezeGame(){
@@ -153,10 +157,20 @@ function startGame(){
 
       t.remove();
 
-      if(type.rare) return end("Perdeu o raro 🤡");
+      if(type.rare){
+  streak = 0;
+  return end("Perdeu o raro 🤡");
+      }
 
+      if(type.cursed){
+        soundScare.cloneNode().play();
+        showScare();
+        return;
+      }
+      
       if(type.normal){
         lives--;
+        streak = 0;
         soundMiss.cloneNode().play();
       }
 
@@ -167,7 +181,10 @@ function startGame(){
 
       clearTimeout(timeout);
 
-      if(type.cursed) return end("Clicou no maldito 😈");
+      if(type.cursed){
+  streak = 0;
+  return end("Clicou no maldito 😈");
+      }
 
       if(type.portal){
         soundPortal.cloneNode().play();
@@ -183,8 +200,9 @@ function startGame(){
         soundRare.cloneNode().play();
       }
       else if(type.bomb){
-        lives--;
-        soundMiss.cloneNode().play();
+  lives--;
+  streak = 0;
+  soundMiss.cloneNode().play();
       }
       else if(type.ice){
         freezeGame();
@@ -199,6 +217,7 @@ function startGame(){
       }
       else{
         score++;
+        streak++;
         soundHit.cloneNode().play();
       }
 
@@ -219,6 +238,24 @@ function startGame(){
 
     let finalSpeed = slowActive ? speed + 400 : speed;
     setTimeout(spawn, finalSpeed);
+  }
+
+  function showScare(){
+  const e = document.createElement("div");
+
+  e.textContent = "👹";
+  e.style.position = "fixed";
+  e.style.top = "50%";
+  e.style.left = "50%";
+  e.style.transform = "translate(-50%, -50%)";
+  e.style.fontSize = "120px";
+  e.style.zIndex = "9999";
+
+  document.body.appendChild(e);
+
+  setTimeout(() => {
+    e.remove();
+  }, 500);
   }
 
   function end(msg="Fim!"){
