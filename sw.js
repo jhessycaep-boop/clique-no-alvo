@@ -1,4 +1,4 @@
-const CACHE_NAME = "clique-no-alvo-v20";
+const CACHE_NAME = "clique-no-alvo-v21";
 
 const ASSETS = [
   "./",
@@ -12,7 +12,10 @@ const ASSETS = [
   "./miss.mp3",
   "./powerup.mp3",
   "./rare.mp3",
-  "./scare.mp3"
+  "./scare.mp3",
+  "./ice.mp3",
+  "./portal.mp3",
+  "./electric.mp3"
 ];
 
 self.addEventListener("install", e=>{
