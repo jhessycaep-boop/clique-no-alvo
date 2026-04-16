@@ -12,6 +12,8 @@ let portalUnlocked = localStorage.getItem("portalUnlocked") === "true";
 
 let frozen = false;
 
+let slowActive = false;
+
 const menu = document.getElementById("menu");
 const shop = document.getElementById("shop");
 const rankingDiv = document.getElementById("ranking");
@@ -116,14 +118,14 @@ function startGame(){
   function pick(){
     let r=Math.random();
 
-    if(r<0.05) return {emoji:"🤡",rare:true};
-    if(r<0.12) return {emoji:"💣",bomb:true};
-    if(upgrades.ice && r<0.18) return {emoji:"❄️",ice:true};
-    if(upgrades.electric && r<0.24) return {emoji:"⚡",electric:true};
-    if(portalUnlocked && r<0.30) return {emoji:"🌀",portal:true};
-    if(cursedUnlocked && r<0.35) return {emoji:"😈",cursed:true};
+    if(r<0.05) return {emoji:"🤡",color:"gold",rare:true};
+    if(r<0.12) return {emoji:"💣",color:"black",bomb:true};
+    if(upgrades.ice && r<0.18) return {emoji:"❄️",color:"cyan",ice:true};
+    if(upgrades.electric && r<0.24) return {emoji:"⚡",color:"yellow",electric:true};
+    if(portalUnlocked && r<0.30) return {emoji:"🌀",color:"magenta",portal:true};
+    if(cursedUnlocked && r<0.35) return {emoji:"😈",color:"purple",cursed:true};
 
-    return {emoji:"🎯",normal:true};
+    return {emoji:"🎯",color:"yellow",normal:true};
   }
 
   function spawn(){
@@ -136,6 +138,7 @@ function startGame(){
     const t=document.createElement("div");
     t.className="target";
     t.textContent=type.emoji;
+    t.style.background = type.color || "yellow";
 
     function move(){
       t.style.left=Math.random()*(window.innerWidth-60)+"px";
@@ -190,6 +193,10 @@ function startGame(){
         speed=Math.max(400,speed-100);
         soundElectric.cloneNode().play();
       }
+      else if(type.slow){
+        slowActive = true;
+        setTimeout(()=> slowActive=false, 3000);
+      }
       else{
         score++;
         soundHit.cloneNode().play();
@@ -210,7 +217,8 @@ function startGame(){
       update();
     };
 
-    setTimeout(spawn,speed);
+    let finalSpeed = slowActive ? speed + 400 : speed;
+    setTimeout(spawn, finalSpeed);
   }
 
   function end(msg="Fim!"){
@@ -240,4 +248,11 @@ function startGame(){
 window.buy = buy;
 window.backMenu = backMenu;
 
+  function resetProgress(){
+  localStorage.clear();
+  alert("Progresso resetado!");
+  location.reload();
+}
+
+window.resetProgress = resetProgress;
 });
