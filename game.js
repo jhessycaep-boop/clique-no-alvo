@@ -2,9 +2,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 let coins = Number(localStorage.getItem("coins")) || 0;
 let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
-let upgrades = JSON.parse(localStorage.getItem("upgrades")) || { life:0, time:0, slow:0 };
+
+let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {
+  life:0, time:0, ice:false, electric:false
+};
 
 let cursedUnlocked = localStorage.getItem("cursedUnlocked") === "true";
+let portalUnlocked = localStorage.getItem("portalUnlocked") === "true";
+
+let frozen = false;
 
 const menu = document.getElementById("menu");
 const shop = document.getElementById("shop");
@@ -13,54 +19,56 @@ const game = document.getElementById("game");
 
 const coinsEl = document.getElementById("coins");
 
-// 🔊 ÁUDIOS
+// sons
 const soundHit = new Audio("hit.mp3");
 const soundMiss = new Audio("miss.mp3");
-const soundPower = new Audio("powerup.mp3");
 const soundRare = new Audio("rare.mp3");
 const soundScare = new Audio("scare.mp3");
+const soundIce = new Audio("ice.mp3");
+const soundPortal = new Audio("portal.mp3");
+const soundElectric = new Audio("electric.mp3");
 
 coinsEl.textContent = coins;
 
-// ===== MENU =====
+// MENU
 document.getElementById("playBtn").onclick = startGame;
 document.getElementById("shopBtn").onclick = () => show(shop);
 document.getElementById("rankBtn").onclick = showRanking;
 
 function show(el){
-  menu.style.display = "none";
-  shop.style.display = "none";
-  rankingDiv.style.display = "none";
-  game.style.display = "none";
-  el.style.display = "block";
+  menu.style.display="none";
+  shop.style.display="none";
+  rankingDiv.style.display="none";
+  game.style.display="none";
+  el.style.display="block";
 }
 
-function backMenu(){
-  show(menu);
-}
+function backMenu(){ show(menu); }
 
-// ===== RANKING =====
+// RANKING
 function showRanking(){
   show(rankingDiv);
   const list = document.getElementById("rankList");
-  list.innerHTML = "";
+  list.innerHTML="";
   ranking.forEach((s,i)=>{
-    list.innerHTML += `<li>${i+1}º - ${s}</li>`;
+    list.innerHTML+=`<li>${i+1}º - ${s}</li>`;
   });
 }
 
-// ===== LOJA =====
+// LOJA
 function buy(type){
-  const price = {life:50,time:50,slow:80};
+  const prices = {life:50,time:50,ice:30,electric:40};
 
-  if(coins>=price[type]){
-    coins-=price[type];
-    upgrades[type]++;
+  if(coins >= prices[type]){
+    coins -= prices[type];
+
+    if(type==="ice") upgrades.ice=true;
+    else if(type==="electric") upgrades.electric=true;
+    else upgrades[type]++;
+
     save();
-    coinsEl.textContent = coins;
+    coinsEl.textContent=coins;
     alert("Comprado!");
-  } else {
-    alert("Sem moedas!");
   }
 }
 
@@ -69,92 +77,87 @@ function save(){
   localStorage.setItem("upgrades",JSON.stringify(upgrades));
 }
 
-// ===== JOGO =====
+// JOGO
 function startGame(){
-
-  // desbloquear áudio
-  [soundHit, soundMiss, soundPower, soundRare, soundScare].forEach(s=>{
-    s.play().then(()=>{s.pause();s.currentTime=0;}).catch(()=>{});
-  });
 
   show(game);
 
   game.innerHTML = `
-    <div id="hud">
-      <span>Pontos: <span id="score">0</span></span>
-      <span>Vidas: <span id="lives">5</span></span>
-      <span>Tempo: <span id="timer">60</span></span>
-      <span>Streak: <span id="streak">0</span></span>
-    </div>
-  `;
+  <div id="hud">
+    <span>Pontos: <span id="score">0</span></span>
+    <span>Vidas: <span id="lives">5</span></span>
+    <span>Tempo: <span id="timer">60</span></span>
+  </div>`;
 
   let score=0;
   let lives=5+upgrades.life;
   let time=60+upgrades.time;
-  let streak=0;
+  let speed=900;
 
-  const scoreEl = document.getElementById("score");
-  const livesEl = document.getElementById("lives");
-  const timerEl = document.getElementById("timer");
-  const streakEl = document.getElementById("streak");
+  const scoreEl=document.getElementById("score");
+  const livesEl=document.getElementById("lives");
+  const timerEl=document.getElementById("timer");
 
   function update(){
     scoreEl.textContent=score;
     livesEl.textContent=lives;
     timerEl.textContent=time;
-    streakEl.textContent=streak;
   }
 
-  function pickTarget(){
-    let r = Math.random();
+  function freezeGame(){
+    frozen = true;
+    soundIce.cloneNode().play();
 
-    if(r < 0.05) return {emoji:"🤡", color:"gold", rare:true};
-    if(r < 0.12) return {emoji:"💣", color:"black", bomb:true};
+    setTimeout(()=>{
+      frozen = false;
+    },2000);
+  }
 
-    if(cursedUnlocked && r < 0.20)
-      return {emoji:"😈", color:"purple", cursed:true};
+  function pick(){
+    let r=Math.random();
 
-    return {emoji:"🎯", color:"yellow", normal:true};
+    if(r<0.05) return {emoji:"🤡",rare:true};
+    if(r<0.12) return {emoji:"💣",bomb:true};
+    if(upgrades.ice && r<0.18) return {emoji:"❄️",ice:true};
+    if(upgrades.electric && r<0.24) return {emoji:"⚡",electric:true};
+    if(portalUnlocked && r<0.30) return {emoji:"🌀",portal:true};
+    if(cursedUnlocked && r<0.35) return {emoji:"😈",cursed:true};
+
+    return {emoji:"🎯",normal:true};
   }
 
   function spawn(){
 
     if(time<=0||lives<=0) return end();
+    if(frozen) return setTimeout(spawn,200);
 
-    const type = pickTarget();
+    const type=pick();
 
     const t=document.createElement("div");
     t.className="target";
     t.textContent=type.emoji;
-    t.style.background=type.color;
 
-    t.style.left=Math.random()*(window.innerWidth-60)+"px";
-    t.style.top=80+Math.random()*(window.innerHeight-140)+"px";
+    function move(){
+      t.style.left=Math.random()*(window.innerWidth-60)+"px";
+      t.style.top=80+Math.random()*(window.innerHeight-140)+"px";
+    }
 
+    move();
     game.appendChild(t);
 
     let timeout=setTimeout(()=>{
-
       if(!game.contains(t)) return;
 
       t.remove();
 
       if(type.rare) return end("Perdeu o raro 🤡");
 
-      if(type.cursed){
-        soundScare.cloneNode().play();
-        showScare();
-        return;
-      }
-
       if(type.normal){
         lives--;
-        streak=0;
         soundMiss.cloneNode().play();
       }
 
       update();
-
     },800);
 
     t.onclick=()=>{
@@ -162,6 +165,12 @@ function startGame(){
       clearTimeout(timeout);
 
       if(type.cursed) return end("Clicou no maldito 😈");
+
+      if(type.portal){
+        soundPortal.cloneNode().play();
+        move();
+        return;
+      }
 
       t.classList.add("hit");
       setTimeout(()=>t.remove(),100);
@@ -172,46 +181,40 @@ function startGame(){
       }
       else if(type.bomb){
         lives--;
-        streak=0;
         soundMiss.cloneNode().play();
+      }
+      else if(type.ice){
+        freezeGame();
+      }
+      else if(type.electric){
+        speed=Math.max(400,speed-100);
+        soundElectric.cloneNode().play();
       }
       else{
         score++;
-        streak++;
         soundHit.cloneNode().play();
       }
 
-      // desbloqueio
-      if(streak >= 20 && !cursedUnlocked){
-        cursedUnlocked = true;
+      if(score>=35 && !portalUnlocked){
+        portalUnlocked=true;
+        localStorage.setItem("portalUnlocked","true");
+        alert("🌀 Portal desbloqueado!");
+      }
+
+      if(score>=20 && !cursedUnlocked){
+        cursedUnlocked=true;
         localStorage.setItem("cursedUnlocked","true");
-        alert("😈 Alvo maldito desbloqueado!");
+        alert("😈 Maldito desbloqueado!");
       }
 
       update();
     };
 
-    setTimeout(spawn,900);
-  }
-
-  function showScare(){
-    const e=document.createElement("div");
-    e.textContent="👹";
-    e.style.position="fixed";
-    e.style.fontSize="120px";
-    e.style.top="50%";
-    e.style.left="50%";
-    e.style.transform="translate(-50%,-50%)";
-    e.style.zIndex="9999";
-    document.body.appendChild(e);
-
-    setTimeout(()=>e.remove(),500);
+    setTimeout(spawn,speed);
   }
 
   function end(msg="Fim!"){
-
     coins+=Math.floor(score/2);
-
     ranking.push(score);
     ranking.sort((a,b)=>b-a);
     ranking=ranking.slice(0,5);
@@ -223,13 +226,17 @@ function startGame(){
     location.reload();
   }
 
-  setInterval(()=>{time--;update();},1000);
+  setInterval(()=>{
+    if(!frozen){
+      time--;
+      update();
+    }
+  },1000);
 
   spawn();
   update();
 }
 
-// global
 window.buy = buy;
 window.backMenu = backMenu;
 
