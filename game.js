@@ -222,6 +222,7 @@ function startGame(){
       if(type.rare){
         if(score >= 25){
           bonusUnlocked = true;
+          localStorage.setItem("bonusUnlocked","true");
           alert("💰 Alvo bônus desbloqueado!");
         }
 
@@ -266,6 +267,7 @@ function startGame(){
       if(type.cursed){
         if(bombClicks >= 5 && score >= 15){
           magnetUnlocked = true;
+          localStorage.setItem("magnetUnlocked","true");
           alert("🧲 Alvo ímã desbloqueado!");
         }
 
@@ -278,6 +280,7 @@ function startGame(){
 
         if(portalCount >= 5){
           trollUnlocked = true;
+          localStorage.setItem("trollUnlocked","true");
           alert("🤡 Alvo troll desbloqueado!");
         }
         
@@ -366,6 +369,7 @@ function startGame(){
       }
 
       if(score >= 100 && !invisibleUnlocked){
+        invisibleUnlocked = true;
         localStorage.setItem("invisibleUnlocked","true");
         alert("👻 Invisível desbloqueado!");
       }
