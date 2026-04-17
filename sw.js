@@ -1,4 +1,4 @@
-const CACHE_NAME = "clique-no-alvo-v29";
+const CACHE_NAME = "clique-no-alvo-v30";
 
 const ASSETS = [
   "./",
