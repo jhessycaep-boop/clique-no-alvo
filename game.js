@@ -55,15 +55,17 @@ function show(el){
 
   el.style.display="flex";
 
-  // 🔥 SE FOR A LOJA
-  //if(el === shop){
-  //  const recoverArea = document.getElementById("recoverArea");
+ if(el === shop){
+  const recoverArea = document.getElementById("recoverArea");
 
-//if(canRecover){
-//  recoverArea.innerHTML = `<button onclick="buy('recover')">💥 Crashador (-10)</button>`;
-//} else {
-//  recoverArea.innerHTML = "";
-//}
+  if(recoverArea){
+    if(canRecover){
+      recoverArea.innerHTML = `<button onclick="buy('recover')">💥 Crashador (-10)</button>`;
+    } else {
+      recoverArea.innerHTML = "";
+    }
+  }
+ }
 }
 
 function backMenu(){ show(menu); }
@@ -102,6 +104,8 @@ function buy(type){
   localStorage.setItem("canRecover", "false");
 
   alert("TROLLEI! Moedas devolvidas 😈");
+
+  canRecover = false;
 
   location.reload();
   }
@@ -190,6 +194,10 @@ function startGame(){
     t.textContent=type.emoji;
     t.style.background = type.color || "yellow";
 
+    let blink;
+
+    let trollMove;
+
     function move(){
       t.style.left=Math.random()*(window.innerWidth-60)+"px";
       t.style.top=80+Math.random()*(window.innerHeight-140)+"px";
@@ -237,7 +245,7 @@ function startGame(){
         t.style.opacity = "0";
         invisibleActive = true;
 
-       let blink = setInterval(()=>{
+       blink = setInterval(()=>{
           t.style.opacity = "1";
           setTimeout(()=> t.style.opacity="0",200);
         },20000);
@@ -321,7 +329,7 @@ function startGame(){
   if(!trollActive){
     trollActive = true;
 
-    let trollMove = setInterval(()=>{
+    trollMove = setInterval(()=>{
       move();
     }, 100);
 
@@ -358,7 +366,7 @@ function startGame(){
       }
 
       if(score >= 100 && !invisibleUnlocked){
-        invisibleUnlocked = true;
+        localStorage.setItem("invisibleUnlocked","true");
         alert("👻 Invisível desbloqueado!");
       }
 
@@ -424,6 +432,8 @@ setTimeout(spawn, finalSpeed);
     <button onclick="continueGame()">Pagar 100</button>
     <button onclick="crashGame()">Não tenho moedas</button>
     `;
+
+    box.onclick = e => e.stopPropagation();
 
     box.style.position = "fixed";
 box.style.top = "0";
