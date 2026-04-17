@@ -10,7 +10,6 @@ const ASSETS = [
   "./icon-512-v4.png",
   "./hit.mp3",
   "./miss.mp3",
-  "./powerup.mp3",
   "./rare.mp3",
   "./scare.mp3",
   "./ice.mp3",
