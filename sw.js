@@ -15,10 +15,10 @@ const ASSETS = [
   "./scare.mp3",
   "./ice.mp3",
   "./portal.mp3",
-  "./electric.mp3"
-  "./magnet.mp3"
-  "./invisible.mp3"
-  "./bonus.mp3"
+  "./electric.mp3",
+  "./magnet.mp3",
+  "./invisible.mp3",
+  "./bonus.mp3",
   "./troll.mp3"
 ];
 
