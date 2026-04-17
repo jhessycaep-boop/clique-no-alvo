@@ -365,7 +365,7 @@ function startGame(){
         alert("🌀 Portal desbloqueado!");
       }
 
-      if(score>=20 && !cursedUnlocked){
+      if(streak>=20 && !cursedUnlocked){
         cursedUnlocked=true;
         localStorage.setItem("cursedUnlocked","true");
         alert("😈 Maldito desbloqueado!");
