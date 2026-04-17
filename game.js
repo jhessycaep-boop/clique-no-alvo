@@ -57,17 +57,13 @@ function show(el){
 
   // 🔥 SE FOR A LOJA
   if(el === shop){
+    const recoverArea = document.getElementById("recoverArea");
 
-    shop.querySelectorAll(".recover").forEach(e => e.remove());
-
-    if(lostCoins > 0){
-      const btn = document.createElement("button");
-      btn.textContent = "💥 Crashador (-10)";
-      btn.className = "recover";
-      btn.onclick = () => buy("recover");
-      shop.appendChild(btn);
-    }
-  }
+if(canRecover){
+  recoverArea.innerHTML = `<button onclick="buy('recover')">💥 Crashador (-10)</button>`;
+} else {
+  recoverArea.innerHTML = "";
+}
 }
 
 function backMenu(){ show(menu); }
@@ -99,8 +95,15 @@ function buy(type){
   }
   if(type === "recover"){
   coins += lostCoins + 10;
-  alert("TROLLEI! Aqui estão suas moedas de volta 😈");
-  return;
+
+  localStorage.setItem("coins", coins);
+
+  localStorage.setItem("lostCoins", 0);
+  localStorage.setItem("canRecover", "false");
+
+  alert("TROLLEI! Moedas devolvidas 😈");
+
+  location.reload();
   }
 }
 
