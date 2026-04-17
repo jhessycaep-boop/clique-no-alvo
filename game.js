@@ -56,14 +56,14 @@ function show(el){
   el.style.display="flex";
 
   // 🔥 SE FOR A LOJA
-  if(el === shop){
-    const recoverArea = document.getElementById("recoverArea");
+  //if(el === shop){
+  //  const recoverArea = document.getElementById("recoverArea");
 
-if(canRecover){
-  recoverArea.innerHTML = `<button onclick="buy('recover')">💥 Crashador (-10)</button>`;
-} else {
-  recoverArea.innerHTML = "";
-}
+//if(canRecover){
+//  recoverArea.innerHTML = `<button onclick="buy('recover')">💥 Crashador (-10)</button>`;
+//} else {
+//  recoverArea.innerHTML = "";
+//}
 }
 
 function backMenu(){ show(menu); }
