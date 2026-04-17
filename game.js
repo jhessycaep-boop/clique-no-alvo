@@ -118,6 +118,9 @@ function save(){
 
 // JOGO
 function startGame(){
+  document.body.onclick = () => {
+  soundHit.play().then(()=>soundHit.pause()).catch(()=>{});
+};
 
   show(game);
 
@@ -320,7 +323,7 @@ function startGame(){
       }
       else if(type.invisible){
         invisibleActive = false;
-        clearInterval(blink);
+        if(blink) clearInterval(blink);
         soundInvisible.cloneNode().play();
       }
       else if(type.bonus){
@@ -346,7 +349,7 @@ function startGame(){
     localStorage.setItem("canRecover", "true");
     
     soundTroll.cloneNode().play();
-    return end("TROLLEI 🤡");
+    end("TROLLEI 🤡",true);
   }
 
       }
@@ -404,17 +407,21 @@ setTimeout(spawn, finalSpeed);
   }, 500);
   }
 
-  function end(msg="Fim!"){
-    coins+=Math.floor(score/2);
-    ranking.push(score);
-    ranking.sort((a,b)=>b-a);
-    ranking=ranking.slice(0,5);
+  function end(msg="Fim!", noReward=false){
 
-    save();
-    localStorage.setItem("ranking",JSON.stringify(ranking));
+  if(!noReward){
+    coins += Math.floor(score/2);
+  }
 
-    alert(msg+"\nPontuação: "+score);
-    location.reload();
+  ranking.push(score);
+  ranking.sort((a,b)=>b-a);
+  ranking = ranking.slice(0,5);
+
+  save();
+  localStorage.setItem("ranking",JSON.stringify(ranking));
+
+  alert(msg+"\nPontuação: "+score);
+  location.reload();
   }
 
   setInterval(()=>{
@@ -465,6 +472,9 @@ box.style.alignItems = "center";
 
 window.buy = buy;
 window.backMenu = backMenu;
+window.continueGame = continueGame;
+window.crashGame = crashGame;
+  
 
   function resetProgress(){
   localStorage.clear();
@@ -474,7 +484,5 @@ window.backMenu = backMenu;
 
 window.resetProgress = resetProgress;
 });
-window.continueGame = continueGame;
-window.crashGame = crashGame;
 
 console.log("JS carregou até o final.");
