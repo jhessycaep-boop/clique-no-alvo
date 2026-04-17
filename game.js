@@ -51,7 +51,22 @@ function show(el){
   shop.style.display="none";
   rankingDiv.style.display="none";
   game.style.display="none";
-  el.style.display="block";
+
+  el.style.display="flex";
+
+  // 🔥 SE FOR A LOJA
+  if(el === shop){
+
+    shop.querySelectorAll(".recover").forEach(e => e.remove());
+
+    if(lostCoins > 0){
+      const btn = document.createElement("button");
+      btn.textContent = "💥 Crashador (-10)";
+      btn.className = "recover";
+      btn.onclick = () => buy("recover");
+      shop.appendChild(btn);
+    }
+  }
 }
 
 function backMenu(){ show(menu); }
@@ -176,13 +191,15 @@ function startGame(){
       t.style.top=80+Math.random()*(window.innerHeight-140)+"px";
     }
 
+    move();
+    
     if(magnetActive){
       t.style.transition = "0.3s";
       t.style.left = "50%";
       t.style.top = "50%";
     }
 
-    move();
+    
     game.appendChild(t);
 
     let timeout=setTimeout(()=>{
@@ -216,7 +233,7 @@ function startGame(){
         t.style.opacity = "0";
         invisibleActive = true;
 
-        setInterval(()=>{
+       let blink = setInterval(()=>{
           t.style.opacity = "1";
           setTimeout(()=> t.style.opacity="0",200);
         },20000);
@@ -267,7 +284,7 @@ function startGame(){
       else if(type.bomb){
         lives--;
         streak = 0;
-        bombClicks++
+        bombClicks++;
         soundMiss.cloneNode().play();
       }
       else if(type.ice){
@@ -288,6 +305,7 @@ function startGame(){
       }
       else if(type.invisible){
         invisibleActive = false;
+        clearInterval(blink);
         soundInvisible.cloneNode().play();
       }
       else if(type.bonus){
@@ -343,7 +361,7 @@ function startGame(){
     let finalSpeed = speed;
 
 if(invisibleActive){
-  finalSpeed = speed - 200; // deixa mais rápido
+  finalSpeed = Math.max(200, speed - 200);
 }
 
 setTimeout(spawn, finalSpeed);
@@ -400,6 +418,18 @@ setTimeout(spawn, finalSpeed);
     <button onclick="crashGame()">Não tenho moedas</button>
     `;
 
+    box.style.position = "fixed";
+box.style.top = "0";
+box.style.left = "0";
+box.style.width = "100%";
+box.style.height = "100%";
+box.style.background = "black";
+box.style.zIndex = "9999";
+box.style.display = "flex";
+box.style.flexDirection = "column";
+box.style.justifyContent = "center";
+box.style.alignItems = "center";
+
     document.body.appendChild(box);
   }
 
@@ -409,7 +439,7 @@ setTimeout(spawn, finalSpeed);
   }
 
   function crashGame(){
-    window.close();
+    throw new Error("Jogo crashou 😈");
   }
 
 window.buy = buy;
