@@ -460,3 +460,5 @@ window.backMenu = backMenu;
 
 window.resetProgress = resetProgress;
 });
+
+console.log("JS carregou até o final.");
