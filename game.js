@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 let coins = Number(localStorage.getItem("coins")) || 0;
 let lostCoins = Number(localStorage.getItem("lostCoins")) || 0;
+let canRecover = localStorage.getItem("canRecover") === "true";
 let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
 
 let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {
@@ -326,6 +327,9 @@ function startGame(){
     localStorage.setItem("lostCoins",lostCoins);
     
     coins = 0;
+    localStorage.setItem("coins",coins);
+
+    localStorage.setItem("canRecover", "true");
     
     soundTroll.cloneNode().play();
     return end("TROLLEI 🤡");
