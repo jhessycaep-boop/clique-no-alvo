@@ -474,5 +474,7 @@ window.backMenu = backMenu;
 
 window.resetProgress = resetProgress;
 });
+window.continueGame = continueGame;
+window.crashGame = crashGame;
 
 console.log("JS carregou até o final.");
