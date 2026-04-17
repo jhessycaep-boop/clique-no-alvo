@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
 let coins = Number(localStorage.getItem("coins")) || 0;
+let lostCoins = Number(localStorage.getItem("lostCoins")) || 0;
 let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
 
 let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {
@@ -12,7 +13,8 @@ let portalUnlocked = localStorage.getItem("portalUnlocked") === "true";
 let invisibleUnlocked = localStorage.getItem("invisibleUnlocked") === "true";
 let bonusUnlocked = localStorage.getItem("bonusUnlocked") === "true";
 let trollUnlocked = localStorage.getItem("trollUnlocked") === "true";
-
+let magnetUnlocked = localStorage.getItem("magnetUnlocked") === "true";
+  
 let frozen = false;
 
 let slowActive = false;
@@ -113,7 +115,6 @@ function startGame(){
   let magnetActive = false;
   let invisibleActive = false;
   let trollActive = false;
-  let lostCoins = 0;
   let portalCount = 0;
 
   const scoreEl=document.getElementById("score");
@@ -149,7 +150,7 @@ function startGame(){
     if(magnetUnlocked && r < 0.38)
       return {emoji:"🧲",color:"red",magnet:true};
     if(invisibleUnlocked && r < 0.42)
-      return {emoji:"👻",invisible:true);
+      return {emoji:"👻",invisible:true};
     if(bonusUnlocked && r < 0.45)
       return {emoji:"💰",color:"lime",bonus:true};
     if(trollUnlocked && r < 0.5)
@@ -304,7 +305,10 @@ function startGame(){
 
   } else {
     lostCoins = coins;
+    localStorage.setItem("lostCoins",lostCoins);
+    
     coins = 0;
+    
     soundTroll.cloneNode().play();
     return end("TROLLEI 🤡");
   }
