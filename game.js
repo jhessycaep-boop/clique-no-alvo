@@ -9,6 +9,9 @@ let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {
 
 let cursedUnlocked = localStorage.getItem("cursedUnlocked") === "true";
 let portalUnlocked = localStorage.getItem("portalUnlocked") === "true";
+let invisibleUnlocked = localStorage.getItem("invisibleUnlocked") === "true";
+let bonusUnlocked = localStorage.getItem("bonusUnlocked") === "true";
+let trollUnlocked = localStorage.getItem("trollUnlocked") === "true";
 
 let frozen = false;
 
@@ -29,6 +32,10 @@ const soundScare = new Audio("scare.mp3");
 const soundIce = new Audio("ice.mp3");
 const soundPortal = new Audio("portal.mp3");
 const soundElectric = new Audio("electric.mp3");
+const soundMagnet = new Audio("magnet.mp3");
+const soundInvisible = new Audio("invisible.mp3");
+const soundBonus = new Audio("bonus.mp3");
+const soundTroll = new Audio("troll.mp3");
 
 coinsEl.textContent = coins;
 
@@ -72,6 +79,11 @@ function buy(type){
     coinsEl.textContent=coins;
     alert("Comprado!");
   }
+  if(type === "recover"){
+  coins += lostCoins + 10;
+  alert("TROLLEI! Aqui estão suas moedas de volta 😈");
+  return;
+  }
 }
 
 function save(){
@@ -97,6 +109,12 @@ function startGame(){
   let time=60+upgrades.time;
   let streak = 0;
   let speed=900;
+  let bombClicks = 0;
+  let magnetActive = false;
+  let invisibleActive = false;
+  let trollActive = false;
+  let lostCoins = 0;
+  let portalCount = 0;
 
   const scoreEl=document.getElementById("score");
   const livesEl=document.getElementById("lives");
@@ -128,6 +146,14 @@ function startGame(){
     if(upgrades.electric && r<0.24) return {emoji:"⚡",color:"yellow",electric:true};
     if(portalUnlocked && r<0.30) return {emoji:"🌀",color:"magenta",portal:true};
     if(cursedUnlocked && r<0.35) return {emoji:"😈",color:"purple",cursed:true};
+    if(magnetUnlocked && r < 0.38)
+      return {emoji:"🧲",color:"red",magnet:true};
+    if(invisibleUnlocked && r < 0.42)
+      return {emoji:"👻",invisible:true);
+    if(bonusUnlocked && r < 0.45)
+      return {emoji:"💰",color:"lime",bonus:true};
+    if(trollUnlocked && r < 0.5)
+      return {emoji:"🤡",color:"orange",troll:true};
 
     return {emoji:"🎯",color:"yellow",normal:true};
   }
@@ -149,6 +175,12 @@ function startGame(){
       t.style.top=80+Math.random()*(window.innerHeight-140)+"px";
     }
 
+    if(magnetActive){
+      t.style.transition = "0.3s";
+      t.style.left = "50%";
+      t.style.top = "50%";
+    }
+
     move();
     game.appendChild(t);
 
@@ -158,8 +190,13 @@ function startGame(){
       t.remove();
 
       if(type.rare){
-  streak = 0;
-  return end("Perdeu o raro 🤡");
+        if(score >= 25){
+          bonusUnlocked = true;
+          alert("💰 Alvo bônus desbloqueado!");
+        }
+
+        streak = 0;
+        return end("Perdeu o raro 🤡");
       }
 
       if(type.cursed){
@@ -174,6 +211,21 @@ function startGame(){
         soundMiss.cloneNode().play();
       }
 
+      if(type.invisible){
+        t.style.opacity = "0";
+        invisibleActive = true;
+
+        setInterval(()=>{
+          t.style.opacity = "1";
+          setTimeout(()=> t.style.opacity="0",200);
+        },20000);
+      }
+
+      if(type.bonus){
+        showBonusScreen();
+        return;
+      }
+
       update();
     },800);
 
@@ -182,11 +234,23 @@ function startGame(){
       clearTimeout(timeout);
 
       if(type.cursed){
-  streak = 0;
-  return end("Clicou no maldito 😈");
+        if(bombClicks >= 5 && score >= 15){
+          magnetUnlocked = true;
+          alert("🧲 Alvo ímã desbloqueado!");
+        }
+
+        streak = 0;
+        return end("Clicou no maldito 😈");
       }
 
       if(type.portal){
+        portalCount++;
+
+        if(portalCount >= 5){
+          trollUnlocked = true;
+          alert("🤡 Alvo troll desbloqueado!");
+        }
+        
         soundPortal.cloneNode().play();
         move();
         return;
@@ -200,11 +264,13 @@ function startGame(){
         soundRare.cloneNode().play();
       }
       else if(type.bomb){
-  lives--;
-  streak = 0;
-  soundMiss.cloneNode().play();
+        lives--;
+        streak = 0;
+        bombClicks++
+        soundMiss.cloneNode().play();
       }
       else if(type.ice){
+        magnetActive = false;
         freezeGame();
       }
       else if(type.electric){
@@ -214,6 +280,35 @@ function startGame(){
       else if(type.slow){
         slowActive = true;
         setTimeout(()=> slowActive=false, 3000);
+      }
+      else if(type.magnet){
+        magnetActive = true;
+        soundMagnet.cloneNode().play();
+      }
+      else if(type.invisible){
+        invisibleActive = false;
+        soundInvisible.cloneNode().play();
+      }
+      else if(type.bonus){
+        coins += 50;
+        soundBonus.cloneNode().play();
+      }
+      else if(type.troll){
+
+  if(!trollActive){
+    trollActive = true;
+
+    let trollMove = setInterval(()=>{
+      move();
+    }, 100);
+
+  } else {
+    lostCoins = coins;
+    coins = 0;
+    soundTroll.cloneNode().play();
+    return end("TROLLEI 🤡");
+  }
+
       }
       else{
         score++;
@@ -233,11 +328,21 @@ function startGame(){
         alert("😈 Maldito desbloqueado!");
       }
 
+      if(score >= 100 && !invisibleUnlocked){
+        invisibleUnlocked = true;
+        alert("👻 Invisível desbloqueado!");
+      }
+
       update();
     };
 
-    let finalSpeed = slowActive ? speed + 400 : speed;
-    setTimeout(spawn, finalSpeed);
+    let finalSpeed = speed;
+
+if(invisibleActive){
+  finalSpeed = speed - 200; // deixa mais rápido
+}
+
+setTimeout(spawn, finalSpeed);
   }
 
   function showScare(){
@@ -281,6 +386,27 @@ function startGame(){
   spawn();
   update();
 }
+
+  function showBonusScreen(){
+    let box = document.createElement("div");
+
+    box.innerHTML = `
+    <h2>Você perdeu 50 moedas</h2>
+    <button onclick="continueGame()">Pagar 100</button>
+    <button onclick="crashGame()">Não tenho moedas</button>
+    `;
+
+    document.body.appendChild(box);
+  }
+
+  function continueGame(){
+    coins -= 100;
+    location.reload();
+  }
+
+  function crashGame(){
+    window.close();
+  }
 
 window.buy = buy;
 window.backMenu = backMenu;
