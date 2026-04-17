@@ -57,3 +57,7 @@ button:active {
   opacity: 0;
   transition: 0.1s;
 }
+
+body {
+  overflow: hidden;
+}
