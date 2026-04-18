@@ -142,6 +142,7 @@ function startGame(){
   let invisibleActive = false;
   let trollActive = false;
   let portalCount = 0;
+  let paused = false;
 
   const scoreEl=document.getElementById("score");
   const livesEl=document.getElementById("lives");
@@ -189,6 +190,7 @@ function startGame(){
 
     if(time<=0||lives<=0) return end();
     if(frozen) return setTimeout(spawn,200);
+    if(paused) return;
 
     const type=pick();
 
@@ -425,7 +427,7 @@ setTimeout(spawn, finalSpeed);
   }
 
   setInterval(()=>{
-    if(!frozen){
+    if(!frozen && !paused){
       time--;
       update();
     }
@@ -436,6 +438,8 @@ setTimeout(spawn, finalSpeed);
 }
 
   function showBonusScreen(){
+    paused = true;
+    
     let box = document.createElement("div");
 
     box.innerHTML = `
@@ -462,12 +466,19 @@ box.style.alignItems = "center";
   }
 
   function continueGame(){
+  if(coins >= 100){
     coins -= 100;
-    location.reload();
+    localStorage.setItem("coins",coins);
+    paused = false;
+    document.querySelector("div[style*='z-index: 9999']").remove();
+  } else {
+    alert("Sem moedas!");
+  }
   }
 
   function crashGame(){
-    throw new Error("Jogo crashou 😈");
+    alert("Jogo crashou 😈");
+    location.reload();
   }
 
 window.buy = buy;
@@ -485,4 +496,4 @@ window.crashGame = crashGame;
 window.resetProgress = resetProgress;
 });
 
-console.log("JS carregou até o final.");
+alert("JS carregou até o final.");
