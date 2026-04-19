@@ -118,9 +118,17 @@ function save(){
 
 // JOGO
 function startGame(){
-  document.body.onclick = () => {
-  soundHit.play().then(()=>soundHit.pause()).catch(()=>{});
-};
+  document.body.addEventListener("click", unlockAudio, { once: true });
+
+function unlockAudio(){
+  [
+    soundHit, soundMiss, soundRare, soundScare,
+    soundIce, soundPortal, soundElectric,
+    soundMagnet, soundInvisible, soundBonus, soundTroll
+  ].forEach(s => {
+    s.play().then(()=>s.pause()).catch(()=>{});
+  });
+}
 
   show(game);
 
@@ -142,8 +150,7 @@ function startGame(){
   let invisibleActive = false;
   let trollActive = false;
   let portalCount = 0;
-  let paused = false;
-
+  
   const scoreEl=document.getElementById("score");
   const livesEl=document.getElementById("lives");
   const timerEl=document.getElementById("timer");
@@ -190,7 +197,11 @@ function startGame(){
 
     if(time<=0||lives<=0) return end();
     if(frozen) return setTimeout(spawn,200);
-    if(paused) return;
+    
+    if(paused){
+  setTimeout(spawn, 200);
+  return;
+    }
 
     const type=pick();
 
@@ -437,8 +448,14 @@ setTimeout(spawn, finalSpeed);
   update();
 }
 
+  let bonuxBox;
+
+  let paused = false;
+
   function showBonusScreen(){
     paused = true;
+
+    bonusBox = box;
     
     let box = document.createElement("div");
 
@@ -470,7 +487,7 @@ box.style.alignItems = "center";
     coins -= 100;
     localStorage.setItem("coins",coins);
     paused = false;
-    document.querySelector("div[style*='z-index: 9999']").remove();
+    bonusBox.remove();
   } else {
     alert("Sem moedas!");
   }
