@@ -68,6 +68,46 @@ function show(el){
  }
 }
 
+ function showTargets(){
+  let box = document.createElement("div");
+
+  box.innerHTML = `
+  <h2>📖 Alvos</h2>
+
+  <p>🎯 Normal - padrão</p>
+  <p>🤡 Raro - não pode perder</p>
+  <p>💣 Bomba - tira vida</p>
+  <p>❄️ Gelo - compra na loja</p>
+  <p>⚡ Elétrico - compra na loja</p>
+
+  <p>🌀 Portal - 35 pontos</p>
+  <p>😈 Maldito - streak 20</p>
+  <p>👻 Invisível - 80 pontos</p>
+  <p>🧲 Ímã - clicar em 5 bombas + clicar no maldito com 15 pontos</p>
+  <p>💰 Bônus - perder raro com 25 pontos</p>
+  <p>🤡 Troll - 5 portais</p>
+
+  <button onclick="this.parentElement.remove()">Fechar</button>
+  `;
+
+  Object.assign(box.style,{
+    position:"fixed",
+    top:0,left:0,
+    width:"100%",height:"100%",
+    background:"black",
+    color:"white",
+    zIndex:"9999",
+    display:"flex",
+    flexDirection:"column",
+    justifyContent:"center",
+    alignItems:"center"
+  });
+
+  document.body.appendChild(box);
+}
+
+window.showTargets = showTargets;
+
 function backMenu(){ show(menu); }
 
 // RANKING
@@ -362,7 +402,7 @@ function unlockAudio(){
     localStorage.setItem("canRecover", "true");
     
     soundTroll.cloneNode().play();
-    end("TROLLEI 🤡",true);
+    end("TROLLEI 🤡 Moedas resetadas.",true);
   }
 
       }
@@ -384,7 +424,7 @@ function unlockAudio(){
         alert("😈 Maldito desbloqueado!");
       }
 
-      if(score >= 100 && !invisibleUnlocked){
+      if(score >= 80 && !invisibleUnlocked){
         invisibleUnlocked = true;
         localStorage.setItem("invisibleUnlocked","true");
         alert("👻 Invisível desbloqueado!");
@@ -513,4 +553,4 @@ window.crashGame = crashGame;
 window.resetProgress = resetProgress;
 });
 
-alert("JS carregou até o final.");
+
