@@ -1,18 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
   
-document.addEventListener("click", unlockAudio, { once: true });
-
-function unlockAudio(){
-  [
-    soundHit, soundMiss, soundRare, soundScare,
-    soundIce, soundPortal, soundElectric,
-    soundMagnet, soundInvisible, soundBonus, soundTroll
-  ].forEach(s => {
-    s.currentTime = 0;
-    s.play().then(()=>s.pause()).catch(()=>{});
-  });
-}
-  
 let coins = Number(localStorage.getItem("coins")) || 0;
 let lostCoins = Number(localStorage.getItem("lostCoins")) || 0;
 let canRecover = localStorage.getItem("canRecover") === "true";
@@ -52,6 +39,23 @@ const soundMagnet = new Audio("magnet.mp3");
 const soundInvisible = new Audio("invisible.mp3");
 const soundBonus = new Audio("bonus.mp3");
 const soundTroll = new Audio("troll.mp3");
+
+ document.addEventListener("click", unlockAudio, { once: true });
+
+function unlockAudio(){
+  [
+    soundHit, soundMiss, soundRare, soundScare,
+    soundIce, soundPortal, soundElectric,
+    soundMagnet, soundInvisible, soundBonus, soundTroll
+  ].forEach(s => {
+    s.muted = true;
+    s.play().then(()=>{
+      s.pause();
+      s.currentTime = 0;
+      s.muted = false;
+    }).catch(()=>{});
+  });
+}
 
 coinsEl.textContent = coins;
 
@@ -208,7 +212,8 @@ function startGame(){
 
   function freezeGame(){
     frozen = true;
-    soundIce.cloneNode().play();
+    soundIce.currentTime = 0;
+    soundIce.play();
 
     setTimeout(()=>{
       frozen = false;
@@ -241,7 +246,10 @@ function startGame(){
     if(time<=0||lives<=0) return end();
     if(frozen) return setTimeout(spawn,200);
     
-    if(paused) return;
+    if(paused){
+  setTimeout(spawn, 200);
+  return;
+    }
 
     const type=pick();
 
@@ -287,7 +295,8 @@ function startGame(){
       }
 
       if(type.cursed){
-        soundScare.cloneNode().play();
+        soundScare.currentTime = 0;
+        soundScare.play();
         showScare();
         return;
       }
@@ -295,7 +304,8 @@ function startGame(){
       if(type.normal){
         lives--;
         streak = 0;
-        soundMiss.cloneNode().play();
+        soundMiss.currentTime = 0;
+        soundMiss.play();
       }
 
       if(type.invisible){
@@ -340,7 +350,8 @@ function startGame(){
           alert("🤡 Alvo troll desbloqueado!");
         }
         
-        soundPortal.cloneNode().play();
+        soundPortal.currentTime = 0;
+        soundPortal.play();
         move();
         return;
       }
@@ -350,13 +361,15 @@ function startGame(){
 
       if(type.rare){
         score+=5;
-        soundRare.cloneNode().play();
+        soundRare.currentTime = 0;
+        soundRare.play();
       }
       else if(type.bomb){
         lives--;
         streak = 0;
         bombClicks++;
-        soundMiss.cloneNode().play();
+        soundMiss.currentTime = 0;
+        soundMiss.play();
       }
       else if(type.ice){
         magnetActive = false;
@@ -364,7 +377,8 @@ function startGame(){
       }
       else if(type.electric){
         speed=Math.max(400,speed-100);
-        soundElectric.cloneNode().play();
+        soundElectric.currentTime = 0;
+        soundElectric.play();
       }
       else if(type.slow){
         slowActive = true;
@@ -372,16 +386,19 @@ function startGame(){
       }
       else if(type.magnet){
         magnetActive = true;
-        soundMagnet.cloneNode().play();
+        soundMagnet.currentTime = 0;
+        soundMagnet.play();
       }
       else if(type.invisible){
         invisibleActive = false;
         if(blink) clearInterval(blink);
-        soundInvisible.cloneNode().play();
+        soundInvisible.currentTime = 0;
+        soundInvisible.play();
       }
       else if(type.bonus){
         coins += 50;
-        soundBonus.cloneNode().play();
+        soundBonus.currentTime = 0;
+        soundBonus.play();
       }
       else if(type.troll){
 
@@ -401,7 +418,8 @@ function startGame(){
 
     localStorage.setItem("canRecover", "true");
     
-    soundTroll.cloneNode().play();
+    soundTroll.currentTime = 0;
+    soundTroll.play();
     end("TROLLEI 🤡 Moedas resetadas.",true);
   }
 
@@ -409,7 +427,8 @@ function startGame(){
       else{
         score++;
         streak++;
-        soundHit.cloneNode().play();
+        soundHit.currentTime = 0;
+        soundHit.play();
       }
 
       if(score>=35 && !portalUnlocked){
@@ -525,7 +544,6 @@ box.style.alignItems = "center";
     coins -= 100;
     localStorage.setItem("coins",coins);
     paused = false;
-    spawn();
     bonusBox.remove();
   } else {
     alert("Sem moedas!");
