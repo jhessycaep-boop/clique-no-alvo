@@ -1,5 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
+  
+document.addEventListener("click", unlockAudio, { once: true });
 
+function unlockAudio(){
+  [
+    soundHit, soundMiss, soundRare, soundScare,
+    soundIce, soundPortal, soundElectric,
+    soundMagnet, soundInvisible, soundBonus, soundTroll
+  ].forEach(s => {
+    s.currentTime = 0;
+    s.play().then(()=>s.pause()).catch(()=>{});
+  });
+}
+  
 let coins = Number(localStorage.getItem("coins")) || 0;
 let lostCoins = Number(localStorage.getItem("lostCoins")) || 0;
 let canRecover = localStorage.getItem("canRecover") === "true";
@@ -158,17 +171,7 @@ function save(){
 
 // JOGO
 function startGame(){
-  document.body.addEventListener("click", unlockAudio, { once: true });
-
-function unlockAudio(){
-  [
-    soundHit, soundMiss, soundRare, soundScare,
-    soundIce, soundPortal, soundElectric,
-    soundMagnet, soundInvisible, soundBonus, soundTroll
-  ].forEach(s => {
-    s.play().then(()=>s.pause()).catch(()=>{});
-  });
-}
+  
 
   show(game);
 
@@ -238,10 +241,7 @@ function unlockAudio(){
     if(time<=0||lives<=0) return end();
     if(frozen) return setTimeout(spawn,200);
     
-    if(paused){
-  setTimeout(spawn, 200);
-  return;
-    }
+    if(paused) return;
 
     const type=pick();
 
@@ -488,17 +488,15 @@ setTimeout(spawn, finalSpeed);
   update();
 }
 
-  let bonuxBox;
-
+  let bonusBox;
   let paused = false;
 
   function showBonusScreen(){
     paused = true;
 
+    let box = document.createElement("div");
     bonusBox = box;
     
-    let box = document.createElement("div");
-
     box.innerHTML = `
     <h2>Você perdeu 50 moedas</h2>
     <button onclick="continueGame()">Pagar 100</button>
@@ -527,6 +525,7 @@ box.style.alignItems = "center";
     coins -= 100;
     localStorage.setItem("coins",coins);
     paused = false;
+    spawn();
     bonusBox.remove();
   } else {
     alert("Sem moedas!");
