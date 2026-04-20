@@ -49,8 +49,23 @@
 <script src="game.js"></script>
 
 <script>
- if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").then(reg => {
+
+    reg.onupdatefound = () => {
+      const newWorker = reg.installing;
+
+      newWorker.onstatechange = () => {
+        if (newWorker.state === "installed") {
+          if (navigator.serviceWorker.controller) {
+            // nova versão disponível
+            location.reload();
+          }
+        }
+      };
+    };
+
+  });
 }
 </script>
 
