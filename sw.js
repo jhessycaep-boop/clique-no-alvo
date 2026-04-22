@@ -18,7 +18,8 @@ const ASSETS = [
   "./magnet.mp3",
   "./invisible.mp3",
   "./bonus.mp3",
-  "./troll.mp3"
+  "./troll.mp3",
+  "./glitch.mp3"
 ];
 
 self.addEventListener("install", e=>{
