@@ -62,10 +62,17 @@ body {
   overflow: hidden;
 }
 
-@keyframes glitch {
-  0% { transform: translate(2px, -2px); }
-  25% { transform: translate(-2px, 2px); }
-  50% { transform: translate(2px, 2px); }
-  75% { transform: translate(-2px, -2px); }
-  100% { transform: translate(0, 0); }
+#glitchBinary {
+  word-break: break-all;
+  font-size: 12px;
+  line-height: 1.4;
+  animation: glitchText 0.1s infinite;
+}
+
+@keyframes glitchText {
+  0% { text-shadow: 2px 0 red; }
+  25% { text-shadow: -2px 0 blue; }
+  50% { text-shadow: 2px 2px purple; }
+  75% { text-shadow: -2px -2px cyan; }
+  100% { text-shadow: 0 0 5px white; }
 }
