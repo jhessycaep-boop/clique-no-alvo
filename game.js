@@ -108,9 +108,9 @@ function show(el){
 
   if(glitchUnlocked){
   box.innerHTML += `<p style="color:red">
-  ⚠️ Alvo Glitch: 101011010101010101010101010101...
+  ⚠️ Alvo Glitch: ERRO_DE_CARREGAMENTO_Tx0pY??==#~
   </p>
-  <button onclick="openGlitchLink()">???</button>`;
+  <button onclick="openGlitchCode()">???</button>`;
  }
 
   <button onclick="this.parentElement.remove()">Fechar</button>
@@ -539,6 +539,54 @@ setTimeout(spawn, finalSpeed);
 
   setTimeout(()=> e.remove(), 500);
   }
+
+  function openGlitchCode(){
+
+  const code = `1010101110010100100100111001001110100110101010111011000110110010101011011001001110110001101111011001110110010101101111011011110110011100101110101010101011001101101100001011100010001111101100101010101011001111110001101011110110101001100101001100011010010010101100101010011110110101100011111010100010100111100101111011010110101010100001011001101110111001100111001100110010101101101010111001111010111001110001101011101010100110110011111001101110001011100110101010101010010111100100101010100110111011101011101100101010011110101110111010010111001101101100001010100110111101101111001010101111001100100100111010101110011011100100111011101011001100100110111010011110111001101100101010100010010010100110111000011110011010101010101010110111001101100111101001000110010111101110101010011010010011101111011000111010101010101110101000111110111101100110101011100110101101101011101010110110101001110001101010011110101100101001111001110011000010`;
+
+  const screen = document.createElement("div");
+
+  screen.innerHTML = `
+    <h2 style="color:red">Alvo glitch: ERRO_DE_CARREGAMENTO_Tx0pY??==#~</h2>
+    <div id="glitchBinary">${code}</div>
+    <button onclick="this.parentElement.remove()">Fechar</button>
+  `;
+
+  Object.assign(screen.style,{
+    position:"fixed",
+    top:0,
+    left:0,
+    width:"100%",
+    height:"100%",
+    background:"black",
+    color:"lime",
+    zIndex:"99999",
+    padding:"20px",
+    overflow:"auto",
+    fontFamily:"monospace"
+  });
+
+  document.body.appendChild(screen);
+
+  const glitchInterval = setInterval(()=>{
+    const el = document.getElementById("glitchBinary");
+    if(!el){
+      clearInterval(glitchInterval);
+      return;
+    }
+
+    let text = el.textContent.split('');
+
+    for(let i=0;i<5;i++){
+      let idx = Math.floor(Math.random()*text.length);
+      text[idx] = Math.random() > 0.5 ? '1':'0';
+    }
+
+    el.textContent = text.join('');
+  },100);
+}
+
+window.openGlitchCode = openGlitchCode;
 
   function end(msg="Fim!", noReward=false){
 
