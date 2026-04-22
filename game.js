@@ -15,6 +15,7 @@ let invisibleUnlocked = localStorage.getItem("invisibleUnlocked") === "true";
 let bonusUnlocked = localStorage.getItem("bonusUnlocked") === "true";
 let trollUnlocked = localStorage.getItem("trollUnlocked") === "true";
 let magnetUnlocked = localStorage.getItem("magnetUnlocked") === "true";
+let glitchUnlocked = localStorage.getItem("glitchUnlocked") === "true";
   
 let frozen = false;
 
@@ -39,6 +40,7 @@ const soundMagnet = new Audio("magnet.mp3");
 const soundInvisible = new Audio("invisible.mp3");
 const soundBonus = new Audio("bonus.mp3");
 const soundTroll = new Audio("troll.mp3");
+const soundGlitch = new Audio("glitch.mp3");
 
  document.addEventListener("click", unlockAudio, { once: true });
 
@@ -103,6 +105,13 @@ function show(el){
   <p>🧲 Ímã - clicar em 5 bombas + clicar no maldito com 15 pontos</p>
   <p>💰 Bônus - perder raro com 25 pontos</p>
   <p>🤡 Troll - 5 portais</p>
+
+  if(glitchUnlocked){
+  box.innerHTML += `<p style="color:red">
+  ⚠️ Alvo Glitch: 101011010101010101010101010101...
+  </p>
+  <button onclick="openGlitchLink()">???</button>`;
+ }
 
   <button onclick="this.parentElement.remove()">Fechar</button>
   `;
@@ -197,6 +206,7 @@ function startGame(){
   let invisibleActive = false;
   let trollActive = false;
   let portalCount = 0;
+  let bonusCrashCount = Number(localStorage.getItem("bonusCrashCount")) || 0;
   
   const scoreEl=document.getElementById("score");
   const livesEl=document.getElementById("lives");
@@ -237,6 +247,9 @@ function startGame(){
       return {emoji:"💰",color:"lime",bonus:true};
     if(trollUnlocked && r < 0.5)
       return {emoji:"🤡",color:"orange",troll:true};
+    if(glitchUnlocked && r < 0.01){
+  return {emoji:"🟣", glitch:true};
+    }
 
     return {emoji:"🎯",color:"yellow",normal:true};
   }
@@ -424,6 +437,21 @@ function startGame(){
   }
 
       }
+
+        else if(type.glitch){
+  if(Math.random() < 0.5){
+    alert("REALIDADE CORROMPIDA");
+    end("Você venceu?", true);
+    soundGlitch.currentTime = 0;
+    soundGlitch.play();
+  } else {
+    playGlitchEffect();
+    showGlitchScare();
+    return end("Erro fatal.");
+    soundGlitch.currentTime = 0;
+    soundGlitch.play();
+  }
+        }
       else{
         score++;
         streak++;
@@ -479,19 +507,65 @@ setTimeout(spawn, finalSpeed);
   }, 500);
   }
 
+  function playGlitchEffect(){
+  document.body.style.animation = "glitch 0.1s infinite";
+
+  document.body.style.filter = "invert(1) contrast(2)";
+
+  setTimeout(()=>{
+    document.body.style.animation = "";
+    document.body.style.filter = "";
+  }, 2000);
+  }
+
+  function showGlitchScare(){
+  const e = document.createElement("div");
+
+  e.innerHTML = "⚠️";
+  e.style.position = "fixed";
+  e.style.top = 0;
+  e.style.left = 0;
+  e.style.width = "100%";
+  e.style.height = "100%";
+  e.style.background = "red";
+  e.style.color = "black";
+  e.style.fontSize = "150px";
+  e.style.display = "flex";
+  e.style.alignItems = "center";
+  e.style.justifyContent = "center";
+  e.style.zIndex = 9999;
+
+  document.body.appendChild(e);
+
+  setTimeout(()=> e.remove(), 500);
+  }
+
   function end(msg="Fim!", noReward=false){
 
+  // recompensa normal
   if(!noReward){
     coins += Math.floor(score/2);
   }
 
+  // ⭐ VERIFICA DESBLOQUEIO DO GLITCH
+  if(bonusCrashCount >= 20 && score >= 200 && !glitchUnlocked){
+    glitchUnlocked = true;
+    localStorage.setItem("glitchUnlocked", "true");
+
+    // mensagem secreta antes do fim
+    alert("⚠️ Algo estranho foi desbloqueado...");
+  }
+
+  // ranking
   ranking.push(score);
   ranking.sort((a,b)=>b-a);
   ranking = ranking.slice(0,5);
 
+  // salvar tudo
   save();
   localStorage.setItem("ranking",JSON.stringify(ranking));
 
+  // fim do jogo
   alert(msg+"\nPontuação: "+score);
   location.reload();
   }
@@ -551,10 +625,23 @@ box.style.alignItems = "center";
   }
 
   function crashGame(){
+    bonusCrashCount++;
+    localStorage.setItem("bonusCrashCount", bonusCrashCount);
+    
     alert("Jogo crashou 😈");
     location.reload();
   }
 
+function openGlitchLink(){
+  const base64 = "SlNTLTI5OC1PV0o=";
+
+  const url = atob(base64);
+
+  alert("...");
+  window.open(url, "_blank");
+}
+
+window.openGlitchLink = openGlitchLink;
 window.buy = buy;
 window.backMenu = backMenu;
 window.continueGame = continueGame;
