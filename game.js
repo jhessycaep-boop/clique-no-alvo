@@ -108,7 +108,7 @@ function show(el){
   <p>🤡 Troll - 5 portais</p>
   `;
 
-   if(glitchUnlocked){
+   if(localStorage.getItem("glitchSeenList") === "true"){
   box.innerHTML += `<p style="color:red">
   ⚠️ Alvo Glitch: ERRO_DE_CARREGAMENTO_Tx0pY??==#~
   </p>
@@ -211,6 +211,7 @@ function startGame(){
   let trollActive = false;
   let portalCount = 0;
   let bonusCrashCount = Number(localStorage.getItem("bonusCrashCount")) || 0;
+  let seenTargets = new Set();
   
   const scoreEl=document.getElementById("score");
   const livesEl=document.getElementById("lives");
@@ -269,6 +270,18 @@ function startGame(){
     }
 
     const type=pick();
+
+    if(type.normal) seenTargets.add("normal");
+if(type.rare) seenTargets.add("rare");
+if(type.bomb) seenTargets.add("bomb");
+if(type.ice) seenTargets.add("ice");
+if(type.electric) seenTargets.add("electric");
+if(type.portal) seenTargets.add("portal");
+if(type.cursed) seenTargets.add("cursed");
+if(type.invisible) seenTargets.add("invisible");
+if(type.magnet) seenTargets.add("magnet");
+if(type.bonus) seenTargets.add("bonus");
+if(type.troll) seenTargets.add("troll");
 
     const t=document.createElement("div");
     t.className="target";
@@ -622,7 +635,7 @@ setTimeout(spawn, finalSpeed);
   }
 
   function revealKey(){
-    const key = atob(hidden);
+    const key = hidden;
 
     // tela glitch da chave
     const glitchBox = document.createElement("div");
@@ -693,6 +706,19 @@ window.openGlitchCode = openGlitchCode;
     // mensagem secreta antes do fim
     alert("⚠️ Algo estranho foi desbloqueado...");
   }
+
+    const required = [
+  "normal","rare","bomb","ice","electric",
+  "portal","cursed","invisible","magnet","bonus","troll"
+];
+
+const sawAll = required.every(t => seenTargets.has(t));
+
+if(sawAll && localStorage.getItem("glitchSeenList") !== "true"){
+  localStorage.setItem("glitchSeenList", "true");
+
+  alert("Algo está observando você...");
+}
 
   // ranking
   ranking.push(score);
