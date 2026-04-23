@@ -584,6 +584,40 @@ setTimeout(spawn, finalSpeed);
 
     el.textContent = text.join('');
   },100);
+
+    const title = screen.querySelector("h2");
+
+// chave escondida (Base64)
+const hidden = "SlNTLTI5OC1PV0o=";
+
+let pressTimer;
+
+title.addEventListener("touchstart", () => {
+  pressTimer = setTimeout(() => {
+    revealKey();
+  }, 3000);
+});
+
+title.addEventListener("touchend", () => {
+  clearTimeout(pressTimer);
+});
+
+// suporte PC também
+title.addEventListener("mousedown", () => {
+  pressTimer = setTimeout(() => {
+    revealKey();
+  }, 3000);
+});
+
+title.addEventListener("mouseup", () => {
+  clearTimeout(pressTimer);
+});
+
+function revealKey(){
+  const key = atob(hidden);
+
+  alert("CHAVE ENCONTRADA:\n" + key);
+}
 }
 
 window.openGlitchCode = openGlitchCode;
