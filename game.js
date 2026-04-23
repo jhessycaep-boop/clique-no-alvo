@@ -547,8 +547,12 @@ setTimeout(spawn, finalSpeed);
   const screen = document.createElement("div");
 
   screen.innerHTML = `
-    <h2 style="color:red">Alvo glitch: ERRO_DE_CARREGAMENTO_Tx0pY??==#~</h2>
+    <h2 id="glitchTitle" style="color:red; user-select:none;">
+      Alvo glitch: ERRO_DE_CARREGAMENTO_Tx0pY??==#~
+    </h2>
+
     <div id="glitchBinary">${code}</div>
+
     <button onclick="this.parentElement.remove()">Fechar</button>
   `;
 
@@ -568,57 +572,106 @@ setTimeout(spawn, finalSpeed);
 
   document.body.appendChild(screen);
 
+  const binaryEl = screen.querySelector("#glitchBinary");
+  const title = screen.querySelector("#glitchTitle");
+
+  // 🔥 GLITCH NO BINÁRIO
   const glitchInterval = setInterval(()=>{
-    const el = document.getElementById("glitchBinary");
-    if(!el){
+    if(!document.body.contains(screen)){
       clearInterval(glitchInterval);
       return;
     }
 
-    let text = el.textContent.split('');
+    let text = binaryEl.textContent.split('');
 
-    for(let i=0;i<5;i++){
+    for(let i=0;i<Math.random()*20;i++){
       let idx = Math.floor(Math.random()*text.length);
       text[idx] = Math.random() > 0.5 ? '1':'0';
     }
 
-    el.textContent = text.join('');
+    binaryEl.textContent = text.join('');
   },100);
 
-    const title = screen.querySelector("h2");
+  // 🔐 CHAVE (Base64)
+  const hidden = "SlNTLTI5OC1PV0o=";
 
-// chave escondida (Base64)
-const hidden = "SlNTLTI5OC1PV0o=";
+  let pressTimer;
+  let holding = false;
 
-let pressTimer;
+  function startHold(){
+    holding = true;
 
-title.addEventListener("touchstart", () => {
-  pressTimer = setTimeout(() => {
-    revealKey();
-  }, 3000);
-});
+    // efeito visual enquanto segura
+    title.style.transform = "scale(1.1)";
+    title.style.textShadow = "0 0 10px red";
 
-title.addEventListener("touchend", () => {
-  clearTimeout(pressTimer);
-});
+    pressTimer = setTimeout(()=>{
+      revealKey();
+    },3000);
+  }
 
-// suporte PC também
-title.addEventListener("mousedown", () => {
-  pressTimer = setTimeout(() => {
-    revealKey();
-  }, 3000);
-});
+  function stopHold(){
+    holding = false;
+    clearTimeout(pressTimer);
 
-title.addEventListener("mouseup", () => {
-  clearTimeout(pressTimer);
-});
+    title.style.transform = "";
+    title.style.textShadow = "";
+  }
 
-function revealKey(){
-  const key = atob(hidden);
+  function revealKey(){
+    const key = atob(hidden);
 
-  alert("CHAVE ENCONTRADA:\n" + key);
-}
-}
+    // tela glitch da chave
+    const glitchBox = document.createElement("div");
+
+    glitchBox.textContent = key;
+
+    Object.assign(glitchBox.style,{
+      position:"fixed",
+      top:"50%",
+      left:"50%",
+      transform:"translate(-50%, -50%)",
+      fontSize:"50px",
+      color:"white",
+      background:"black",
+      padding:"20px",
+      zIndex:"100000",
+      border:"2px solid red",
+      fontFamily:"monospace"
+    });
+
+    document.body.appendChild(glitchBox);
+
+    // efeito glitch na chave
+    const keyInterval = setInterval(()=>{
+      let text = key.split('');
+
+      for(let i=0;i<3;i++){
+        let idx = Math.floor(Math.random()*text.length);
+        text[idx] = String.fromCharCode(33 + Math.random()*94);
+      }
+
+      glitchBox.textContent = text.join('');
+    },50);
+
+    setTimeout(()=>{
+      clearInterval(keyInterval);
+      glitchBox.textContent = key;
+    },800);
+
+    setTimeout(()=>{
+      glitchBox.remove();
+    },2000);
+  }
+
+  // 📱 MOBILE
+  title.addEventListener("touchstart", startHold);
+  title.addEventListener("touchend", stopHold);
+
+  // 🖥️ PC
+  title.addEventListener("mousedown", startHold);
+  title.addEventListener("mouseup", stopHold);
+  }
 
 window.openGlitchCode = openGlitchCode;
 
