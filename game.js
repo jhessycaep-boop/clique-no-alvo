@@ -48,7 +48,8 @@ function unlockAudio(){
   [
     soundHit, soundMiss, soundRare, soundScare,
     soundIce, soundPortal, soundElectric,
-    soundMagnet, soundInvisible, soundBonus, soundTroll
+    soundMagnet, soundInvisible, soundBonus, soundTroll,
+    soundGlitch
   ].forEach(s => {
     s.muted = true;
     s.play().then(()=>{
@@ -105,16 +106,19 @@ function show(el){
   <p>🧲 Ímã - clicar em 5 bombas + clicar no maldito com 15 pontos</p>
   <p>💰 Bônus - perder raro com 25 pontos</p>
   <p>🤡 Troll - 5 portais</p>
+  `;
 
-  if(glitchUnlocked){
+   if(glitchUnlocked){
   box.innerHTML += `<p style="color:red">
   ⚠️ Alvo Glitch: ERRO_DE_CARREGAMENTO_Tx0pY??==#~
   </p>
-  <button onclick="openGlitchCode()">???</button>`;
+  <button onclick="openGlitchCode()">???</button>
+  `;
  }
 
-  <button onclick="this.parentElement.remove()">Fechar</button>
-  `;
+  box.innerHTML += `
+   <button onclick="this.parentElement.remove()">Fechar</button>
+   `;
 
   Object.assign(box.style,{
     position:"fixed",
@@ -439,17 +443,16 @@ function startGame(){
       }
 
         else if(type.glitch){
+          soundGlitch.currentTime = 0;
+          soundGlitch.play();
+          
   if(Math.random() < 0.5){
     alert("REALIDADE CORROMPIDA");
     end("Você venceu?", true);
-    soundGlitch.currentTime = 0;
-    soundGlitch.play();
   } else {
     playGlitchEffect();
     showGlitchScare();
     return end("Erro fatal.");
-    soundGlitch.currentTime = 0;
-    soundGlitch.play();
   }
         }
       else{
